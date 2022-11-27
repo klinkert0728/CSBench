@@ -1,0 +1,40 @@
+---
+    - name: Install mongo 
+      hosts: "db_replicas, primary_copy"
+      remote_user: daniel.klinkert
+      become: yes
+      tasks:
+        - name: update
+          command: sudo apt -y update
+
+        - name: install gnup
+          command: sudo apt-get -y install gnupg
+        
+        - name: add repo to debian
+          shell: echo 'deb http://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main' | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+        - name: mongo key
+          command: curl -sSL https://www.mongodb.org/static/pgp/server-6.0.asc  -o mongoserver.asc
+        
+        - name: verify
+          shell: gpg --no-default-keyring --keyring ./mongo_key_temp.gpg --import ./mongoserver.asc
+        
+        - name: mongoserverKey
+          shell: gpg --no-default-keyring --keyring ./mongo_key_temp.gpg --export > ./mongoserver_key.gpg
+
+        - name: Move server key to trusted
+          command: sudo mv mongoserver_key.gpg /etc/apt/trusted.gpg.d/
+      
+        - name: update
+          command: sudo apt update
+    
+        - name: install
+          command: sudo apt install -y mongodb-org mongodb-mongosh
+
+        - name: add basic replica config file
+          shell: sudo mv -f mongod.conf /etc/
+    
+        - name: check running service
+          service:
+            name: mongod
+            state: started
