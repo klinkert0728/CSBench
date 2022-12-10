@@ -4,13 +4,13 @@ set -euo pipefail
 
 run=$1
 NUMBER_OF_REPLICAS=$2
-# set the instance name
-INSTANCE_NAME=replica
+
+# set the primary name
 PRIMARY_NAME=primary-experiment-$run
 
 # define file name as id_rsa and id_rsa.pub
 keypair_file="bench_dk_id_rsa"
-# define keypair name used as ccuser
+# define keypair name used as benchUser, be aware that if you change this user, you will need to change the remote_user in all plays for ansible
 keypair_name="benchUser"
 
 # if file does not exist, generate new key pair (id_rsa, id_rsa.pub)
@@ -43,27 +43,13 @@ fi
 
 # Create replicas
 for i in `seq 1 $NUMBER_OF_REPLICAS`; do
-  instance_name="${INSTANCE_NAME}-$i-experiment-$run"
+  instance_name="replica-$i-experiment-$run"
   gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --image-project=debian-cloud  --machine-type=e2-micro --create-disk=auto-delete=yes --tags=replica
   gcloud compute instances add-metadata $instance_name --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 done
 
-# Get the ips of the replicas
-declare -a IPS=($(gcloud compute instances list --filter="tags.items=replica" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
-
-# Get ip of primary
-PRIMARY=($(gcloud compute instances list --filter="tags.items=primary" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
-
-# Pass the IPs to teh host file to replace the template file
-./configureHostFile.sh $PRIMARY ${IPS[@]}
-
 echo "Wait for the instances to spin up"
 sleep 30
 
-# Copy mongo config file to the replicas
-for i in ${IPS[@]}; do
-  scp -i "./$keypair_file" -o StrictHostKeyChecking=no ./ansible/mongod.conf $keypair_name@$i:~/  
-done
-
-# Copy mongo config to primary
-scp -i "./$keypair_file" -o StrictHostKeyChecking=no ./ansible/mongod.conf $keypair_name@$PRIMARY:~/  
+# Configure environment
+./configure_environment.sh $keypair_name $keypair_file

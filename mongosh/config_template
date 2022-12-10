@@ -1,0 +1,9 @@
+rs.initiate( {
+    _id : "rs0",
+    members: [
+       { _id: 0, host: "{{PRIMARY}}:27017" },
+       {{#IPS}}
+       { _id: {{index}}, host: "{{.}}:27017" },
+       {{/IPS}}
+    ]
+ })

@@ -1,7 +1,7 @@
 ---
     - name: Install mongo 
       hosts: "db_replicas, primary_copy"
-      remote_user: daniel.klinkert
+      remote_user: benchUser
       become: yes
       tasks:
         - name: update

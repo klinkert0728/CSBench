@@ -6,6 +6,10 @@ for i in "${@:2}"; do
   IPS+=($(printf '%s' "$i"))
 done
 
+index() {
+  [[ "${moCurrent#*.}"  ]] && echo "$((${moCurrent#*.} + 1))"
+}
+
 export IPS=$IPS
 . ./mo
 cat ansible/host_template.yml | mo > hosts.yml

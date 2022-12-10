@@ -1,4 +1,5 @@
 hosts.yml
 bench_dk_id_rsa
 bench_dk_id_rsa.pub
+members_config.js
 **/*id_rsa*

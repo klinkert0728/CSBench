@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+keypair_name=$1
+keypair_file=$2
+
 # Get the ips of the replicas
 declare -a IPS=($(gcloud compute instances list --filter="tags.items=replica" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
 
@@ -11,6 +14,8 @@ PRIMARY=($(gcloud compute instances list --filter="tags.items=primary" --format=
 # Pass the IPs to teh host file to replace the template file
 ./configureHostFile.sh $PRIMARY ${IPS[@]}
 
+echo $keypair_file
+
 # Copy mongo config file to the replicas
 for i in ${IPS[@]}; do
   scp -i "./$keypair_file" -o StrictHostKeyChecking=no ./ansible/mongod.conf $keypair_name@$i:~/  
@@ -18,3 +23,7 @@ done
 
 # Copy mongo config to primary
 scp -i "./$keypair_file" -o StrictHostKeyChecking=no ./ansible/mongod.conf $keypair_name@$PRIMARY:~/  
+
+ansible-playbook -i hosts.yml ansible/configureMongo.yml
+
+./configurePrimaryMembers.sh $PRIMARY ${IPS[@]}
