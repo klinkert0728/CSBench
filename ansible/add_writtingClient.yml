@@ -17,4 +17,4 @@
           shell: git clone https://github.com/klinkert0728/CSBench.git
 
         - name: Install dependencies
-          shell: ls && pwd && cd ./CSBench/writtingClient && npm install
+          shell: CSBench/writtingClient && npm install
