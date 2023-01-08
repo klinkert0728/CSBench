@@ -1,6 +1,6 @@
 ---
     - name: Add client
-      hosts: "writting_clents"
+      hosts: "writing_clients"
       remote_user: benchUser
       become: yes
       tasks:
@@ -23,4 +23,4 @@
           shell: git clone https://github.com/klinkert0728/CSBench.git
 
         - name: Install dependencies
-          shell: cd CSBench/writtingClient && npm install
+          shell: cd CSBench/writingClient && npm install

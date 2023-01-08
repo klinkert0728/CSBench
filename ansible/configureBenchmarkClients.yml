@@ -1,6 +1,6 @@
 ---
     - name: Initial config
-      hosts: "writting_clents, reading_clients"
+      hosts: "writing_clients, reading_clients"
       remote_user: benchUser
       become: yes
       tasks:
@@ -23,15 +23,15 @@
           shell: git clone https://github.com/klinkert0728/CSBench.git
 
         - name: Install dependencies
-          shell: cd CSBench/writtingClient && npm install
+          shell: cd CSBench/writingClient && npm install
     
     - name: Configure Writting client
-      hosts: "writting_clients"
+      hosts: "writing_clients"
       remote_user: benchUser
       become: yes
       tasks:
         - name: install dependencies
-          shell: cd ./CSBench/writtingClient && npm install
+          shell: cd ./CSBench/writingClient && npm install
 
     - name: Configure Writting client
       hosts: "reading_clients"
