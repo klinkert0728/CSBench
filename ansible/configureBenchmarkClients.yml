@@ -1,5 +1,5 @@
 ---
-    - name: Install Node and npm 
+    - name: Initial config
       hosts: "writting_clents, reading_clients"
       remote_user: benchUser
       become: yes
@@ -7,16 +7,36 @@
         - name: update
           command: sudo apt -y update
 
-        - name: install node and npm
-          command: sudo apt install nodejs npm -y
+        - name: install git
+          command: sudo apt install git -y
+        
+        - name: install curl
+          command: sudo apt install curl -y
+
+        - name: install node
+          shell: curl -sL https://deb.nodesource.com/setup_14.x | bash
+
+        - name: install curl
+          command: sudo apt install nodejs -y
 
         - name: clone repo
           shell: git clone https://github.com/klinkert0728/CSBench.git
 
+        - name: Install dependencies
+          shell: cd CSBench/writtingClient && npm install
+    
     - name: Configure Writting client
       hosts: "writting_clients"
       remote_user: benchUser
       become: yes
       tasks:
         - name: install dependencies
-          shell: cd ./CSBench/writtingClient  && npm install
+          shell: cd ./CSBench/writtingClient && npm install
+
+    - name: Configure Writting client
+      hosts: "reading_clients"
+      remote_user: benchUser
+      become: yes
+      tasks:
+        - name: install dependencies
+          shell: cd ./CSBench/readingClient && npm install

@@ -1,5 +1,5 @@
 ---
-    - name: Install Node, npm, git.
+    - name: Add client
       hosts: "writting_clents"
       remote_user: benchUser
       become: yes
@@ -9,12 +9,18 @@
 
         - name: install git
           command: sudo apt install git -y
-
-        - name: install node and npm
-          command: sudo apt install nodejs npm -y
         
+        - name: install curl
+          command: sudo apt install curl -y
+
+        - name: install node
+          shell: curl -sL https://deb.nodesource.com/setup_14.x | bash
+
+        - name: install curl
+          command: sudo apt install nodejs -y
+
         - name: clone repo
           shell: git clone https://github.com/klinkert0728/CSBench.git
 
         - name: Install dependencies
-          shell: CSBench/writtingClient && npm install
+          shell: cd CSBench/writtingClient && npm install

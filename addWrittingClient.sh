@@ -18,12 +18,12 @@ writting_client_number=$3
 # Attach the client to a current run
 run=$4
 
-instance_name="writting-client-$writting_client_number-experiment-$run"
-gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags="writting-client-$writting_client_number"
+instance_name="writing-client-$writting_client_number-experiment-$run"
+gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=$instance_name
 gcloud compute instances add-metadata $instance_name  --zone=$CLOUDSDK_COMPUTE_ZONE --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
 sleep 20
-CLIENT=($(gcloud compute instances list --filter="tags.items=writting-client-$writting_client_number" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
+CLIENT=($(gcloud compute instances list --filter="tags.items=$instance_name" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
 
 ./configureWrittingClientHostFile.sh $CLIENT
  
