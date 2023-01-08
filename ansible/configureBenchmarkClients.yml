@@ -25,7 +25,7 @@
         - name: Install dependencies
           shell: cd CSBench/writingClient && npm install
     
-    - name: Configure Writting client
+    - name: Configure Writing client
       hosts: "writing_clients"
       remote_user: benchUser
       become: yes
@@ -33,7 +33,7 @@
         - name: install dependencies
           shell: cd ./CSBench/writingClient && npm install
 
-    - name: Configure Writting client
+    - name: Configure Writing client
       hosts: "reading_clients"
       remote_user: benchUser
       become: yes

@@ -1,10 +1,12 @@
 -
     #35.195.32.75  ansible_connection=ssh
     [writing_clients]
-    34.77.63.155 ansible_connection=ssh
+    34.77.125.124 ansible_connection=ssh
+    34.77.226.40 ansible_connection=ssh
+    34.140.155.243 ansible_connection=ssh
     
     [reading_clients]
-    34.77.125.124 ansible_connection=ssh
+    35.233.71.120 ansible_connection=ssh
     
     [reading_clients:vars]
     ansible_user=benchUser
