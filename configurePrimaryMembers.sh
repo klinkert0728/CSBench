@@ -2,6 +2,8 @@
 cd "$(dirname "$0")" # Go to the script's directory
 declare -a IPS=()
 export PRIMARY=$1
+
+# Replica ips are passed starting the second position of the parameters, the first one must be always the primary
 for i in "${@:2}"; do
   IPS+=($(printf '%s' "$i"))
 done

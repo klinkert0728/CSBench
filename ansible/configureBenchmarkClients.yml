@@ -1,0 +1,22 @@
+---
+    - name: Install Node and npm 
+      hosts: "writting_clents, reading_clients"
+      remote_user: benchUser
+      become: yes
+      tasks:
+        - name: update
+          command: sudo apt -y update
+
+        - name: install node and npm
+          command: sudo apt install nodejs npm -y
+
+        - name: clone repo
+          shell: git clone https://github.com/klinkert0728/CSBench.git
+
+    - name: Configure Writting client
+      hosts: "writting_clients"
+      remote_user: benchUser
+      become: yes
+      tasks:
+        - name: install dependencies
+          shell: cd ./CSBench/writtingClient  && npm install

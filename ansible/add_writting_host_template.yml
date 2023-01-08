@@ -1,0 +1,8 @@
+-
+    #35.195.32.75  ansible_connection=ssh
+    [writting_clents]
+    {{WRITTING_CLIENT}} ansible_connection=ssh
+    
+    [writting_clents:vars]
+    ansible_user=benchUser
+    ansible_ssh_private_key_file=./bench_dk_id_rsa

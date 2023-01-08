@@ -4,9 +4,13 @@ set -euo pipefail
 
 run=$1
 NUMBER_OF_REPLICAS=$2
+NUMBER_OF_WR_CLIENTS=$3
 
 # set the primary name
 PRIMARY_NAME=primary-experiment-$run
+
+# set reading client name
+READING_CLIENT="reading-client-$run"
 
 # define file name as id_rsa and id_rsa.pub
 keypair_file="bench_dk_id_rsa"
@@ -29,10 +33,11 @@ export CLOUDSDK_COMPUTE_ZONE="${CLOUDSDK_COMPUTE_REGION}-b"
 
 echo "starting instance..."
 #CREATE VM instance
-gcloud compute instances create $PRIMARY_NAME --project=csbench --image-family=debian-11 --image-project=debian-cloud  --machine-type=e2-micro --create-disk=auto-delete=yes --tags=primary
-
-#upload ssh public key to instance
+gcloud compute instances create $PRIMARY_NAME --project=csbench --image-family=debian-11 --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=primary
 gcloud compute instances add-metadata $PRIMARY_NAME --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
+
+gcloud compute instances create $READING_CLIENT --project=csbench --image-family=debian-11 --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client
+gcloud compute instances add-metadata $READING_CLIENT --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
 #ADD firewall rules for SSH and ICMP for all VM with the tag cloud computing
 if gcloud compute firewall-rules list --filter="name~allow-mongo-firewall" | grep -c allow-mongo-firewall==0; then
@@ -43,13 +48,28 @@ fi
 
 # Create replicas
 for i in `seq 1 $NUMBER_OF_REPLICAS`; do
-  instance_name="replica-$i-experiment-$run"
-  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --image-project=debian-cloud  --machine-type=e2-micro --create-disk=auto-delete=yes --tags=replica
-  gcloud compute instances add-metadata $instance_name --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
+  instance_region=$CLOUDSDK_COMPUTE_ZONE
+  if [ $i == 1 ]; then
+    # create an instance in austrialia to add some latency.
+    instance_region='australia-southeast1-b'
+  fi
+
+  instance_name="replica-$i-experiment-$run-$instance_region"
+  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$instance_region --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=replica
+  gcloud compute instances add-metadata $instance_name  --zone=$instance_region --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
+done
+
+# Create replicas
+for i in `seq 1 $NUMBER_OF_WR_CLIENTS`; do
+  instance_name="writting-client-$i-experiment-$run"
+  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=writting-client
+  gcloud compute instances add-metadata $instance_name  --zone=$CLOUDSDK_COMPUTE_ZONE --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 done
 
 echo "Wait for the instances to spin up"
-sleep 30
+sleep 15
 
 # Configure environment
 ./configure_environment.sh $keypair_name $keypair_file
+
+./configure_benchmark_clients.sh $keypair_name $keypair_file
