@@ -49,20 +49,20 @@ else
     echo "firewall rule already created"
 fi
 
-# # Create replicas
-# for i in `seq 1 $NUMBER_OF_REPLICAS`; do
-#   instance_region=$CLOUDSDK_COMPUTE_ZONE
-#   tags="replica"
-#   if [ $i == 1 ]; then
-#     # create an instance in austrialia to add some latency.
-#     instance_region='australia-southeast1-b'
-#     tags="replica,aus"
-#   fi
+# Create replicas
+for i in `seq 1 $NUMBER_OF_REPLICAS`; do
+  instance_region=$CLOUDSDK_COMPUTE_ZONE
+  tags="replica"
+  if [ $i == 1 ]; then
+    # create an instance in austrialia to add some latency.
+    instance_region='australia-southeast1-b'
+    tags="replica,aus"
+  fi
 
-#   instance_name="replica-$i-experiment-$run-$instance_region"
-#   gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$instance_region --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=$tags
-#   gcloud compute instances add-metadata $instance_name  --zone=$instance_region --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
-# done
+  instance_name="replica-$i-experiment-$run-$instance_region"
+  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$instance_region --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=$tags
+  gcloud compute instances add-metadata $instance_name  --zone=$instance_region --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
+done
 
 # Create replicas
 for i in `seq 1 $NUMBER_OF_WR_CLIENTS`; do
@@ -75,6 +75,6 @@ echo "Wait for the instances to spin up"
 sleep 15
 
 # Configure environment
-#./configure_environment.sh $keypair_name $keypair_file
+./configure_environment.sh $keypair_name $keypair_file
 
 ./configure_benchmark_clients.sh $keypair_name $keypair_file
