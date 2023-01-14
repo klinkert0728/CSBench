@@ -5,4 +5,4 @@ RUN pip install -r /requirements.txt
 
 COPY reading_client.py /
 
-CMD ["python," "/reading_client.py"]
+CMD ["python," "/reading_client.py", "ARG IP"]
