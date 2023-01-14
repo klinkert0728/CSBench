@@ -6,7 +6,8 @@
     {{/IPS}}
     
     [reading_clients]
-    {{READING_CLIENT}} ansible_connection=ssh
+    {{READING_CLIENT_EU}} ansible_connection=ssh
+    {{READING_CLIENT_AUS}} ansible_connection=ssh
     
     [reading_clients:vars]
     ansible_user=benchUser

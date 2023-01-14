@@ -31,13 +31,16 @@ echo "$keypair_name:$(<./${keypair_file}.pub)" > id_rsa_formatted.pub
 export CLOUDSDK_COMPUTE_REGION=europe-west1
 export CLOUDSDK_COMPUTE_ZONE="${CLOUDSDK_COMPUTE_REGION}-b"
 
-echo "starting instance..."
+echo "starting instances..."
 #CREATE VM instance
-gcloud compute instances create $PRIMARY_NAME --project=csbench --image-family=debian-11 --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=primary
+gcloud compute instances create $PRIMARY_NAME --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=primary
 gcloud compute instances add-metadata $PRIMARY_NAME --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
-gcloud compute instances create $READING_CLIENT --project=csbench --image-family=debian-11 --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client
+gcloud compute instances create $READING_CLIENT --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client
 gcloud compute instances add-metadata $READING_CLIENT --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
+
+gcloud compute instances create "$READING_CLIENT-aus" --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,aus
+gcloud compute instances add-metadata "$READING_CLIENT-aus" --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
 #ADD firewall rules for SSH and ICMP for all VM with the tag cloud computing
 if gcloud compute firewall-rules list --filter="name~allow-mongo-firewall" | grep -c allow-mongo-firewall==0; then
@@ -46,23 +49,25 @@ else
     echo "firewall rule already created"
 fi
 
-# Create replicas
-for i in `seq 1 $NUMBER_OF_REPLICAS`; do
-  instance_region=$CLOUDSDK_COMPUTE_ZONE
-  if [ $i == 1 ]; then
-    # create an instance in austrialia to add some latency.
-    instance_region='australia-southeast1-b'
-  fi
+# # Create replicas
+# for i in `seq 1 $NUMBER_OF_REPLICAS`; do
+#   instance_region=$CLOUDSDK_COMPUTE_ZONE
+#   tags="replica"
+#   if [ $i == 1 ]; then
+#     # create an instance in austrialia to add some latency.
+#     instance_region='australia-southeast1-b'
+#     tags="replica,aus"
+#   fi
 
-  instance_name="replica-$i-experiment-$run-$instance_region"
-  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$instance_region --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=replica
-  gcloud compute instances add-metadata $instance_name  --zone=$instance_region --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
-done
+#   instance_name="replica-$i-experiment-$run-$instance_region"
+#   gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$instance_region --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=$tags
+#   gcloud compute instances add-metadata $instance_name  --zone=$instance_region --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
+# done
 
 # Create replicas
 for i in `seq 1 $NUMBER_OF_WR_CLIENTS`; do
-  instance_name="writting-client-$i-experiment-$run"
-  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=writting-client
+  instance_name="writing-client-$i-experiment-$run"
+  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=writing-client
   gcloud compute instances add-metadata $instance_name  --zone=$CLOUDSDK_COMPUTE_ZONE --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 done
 
@@ -70,6 +75,6 @@ echo "Wait for the instances to spin up"
 sleep 15
 
 # Configure environment
-./configure_environment.sh $keypair_name $keypair_file
+#./configure_environment.sh $keypair_name $keypair_file
 
 ./configure_benchmark_clients.sh $keypair_name $keypair_file
