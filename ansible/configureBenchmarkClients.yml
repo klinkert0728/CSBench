@@ -57,9 +57,16 @@
             name: docker
             state: started
             enabled: yes
+
+        - name: run docker
+          docker_image:
+            path: ./CSBench/readingClient/Doockerfile
+            name: reading_client
+            buildargs: 
+              IP: {{ ansible_user }}
         
-        - name: build reading client image
-            shell: docker build -t reading-client-1 . && docker run reading-client-1
+        # - name: build reading client image
+        #     shell: docker build -t reading-client-1 . && docker run reading-client-1
             
         # - name: install dependencies for pythom
         #   shell: cd ./CSBench/readingClient && pip3 -r install requirements.txt 
