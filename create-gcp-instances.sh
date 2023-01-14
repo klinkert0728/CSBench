@@ -39,8 +39,8 @@ gcloud compute instances add-metadata $PRIMARY_NAME --metadata-from-file ssh-key
 gcloud compute instances create $READING_CLIENT --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client
 gcloud compute instances add-metadata $READING_CLIENT --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
-gcloud compute instances create "$READING_CLIENT-aus" --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,aus
-gcloud compute instances add-metadata "$READING_CLIENT-aus" --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
+gcloud compute instances create "$READING_CLIENT-aus" --project=csbench --image-family=debian-11 --zone=australia-southeast1-b --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,aus
+gcloud compute instances add-metadata "$READING_CLIENT-aus" --zone=australia-southeast1-b --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
 #ADD firewall rules for SSH and ICMP for all VM with the tag cloud computing
 if gcloud compute firewall-rules list --filter="name~allow-mongo-firewall" | grep -c allow-mongo-firewall==0; then
@@ -52,7 +52,7 @@ fi
 # Create replicas
 for i in `seq 1 $NUMBER_OF_REPLICAS`; do
   instance_region=$CLOUDSDK_COMPUTE_ZONE
-  tags="replica"
+  tags="replica,eu"
   if [ $i == 1 ]; then
     # create an instance in austrialia to add some latency.
     instance_region='australia-southeast1-b'
@@ -74,7 +74,7 @@ done
 echo "Wait for the instances to spin up"
 sleep 15
 
-# Configure environment
+#Configure environment
 ./configure_environment.sh $keypair_name $keypair_file
 
 ./configure_benchmark_clients.sh $keypair_name $keypair_file

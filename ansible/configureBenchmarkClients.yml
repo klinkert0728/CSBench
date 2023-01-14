@@ -1,6 +1,6 @@
 ---
     - name: Initial config
-      hosts: "writing_clients, reading_clients"
+      hosts: "writing_clients, reading_clients, reading_clients_aus"
       remote_user: benchUser
       become: yes
       tasks:
@@ -12,9 +12,9 @@
         
         - name: install curl
           command: sudo apt install curl -y
-        
-        # - name: clone repo
-        #   shell: git clone https://github.com/klinkert0728/CSBench.git
+
+        - name: clone repo
+          shell: git clone https://github.com/klinkert0728/CSBench.git
     
     - name: Configure Writing client
       hosts: "writing_clients"
@@ -30,8 +30,8 @@
         - name: install dependencies
           shell: cd ./CSBench/writingClient && npm install
 
-    - name: Configure reading client
-      hosts: "reading_clients"
+    - name: install as root in reading clients
+      hosts: "reading_clients, reading_clients_aus"
       remote_user: benchUser
       become: yes
       tasks:
@@ -40,17 +40,31 @@
             name: ["ca-certificates", "curl", "gnupg", "software-properties-common", "apt-transport-https"]
             state: present
 
+        - name: install pip
+          command: sudo apt install python3-pip -y
+        
         - name: Download docker key
           shell: curl -fsSL  https://download.docker.com/linux/debian/gpg | apt-key add -
-
+        
         - name: Docker repo
           apt_repository:
             repo: "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
-
+        
         - name: Install docker
           apt:
             name: ["docker-ce", "docker-ce-cli", "containerd.io", "docker-compose-plugin"]
             state: present
+        
+    - name: Configure reading client
+      hosts: "reading_clients, reading_clients_aus"
+      remote_user: benchUser
+      become: yes
+      tasks:
+        - name: install requests requests
+          command: python3 -m pip install requests
+        
+        - name: pip install Docker
+          command: pip install docker
 
         - name: Start docker
           service:
@@ -59,14 +73,4 @@
             enabled: yes
 
         - name: run docker
-          docker_image:
-            path: ./CSBench/readingClient/Doockerfile
-            name: reading_client
-            buildargs: 
-              IP: {{ ansible_user }}
-        
-        # - name: build reading client image
-        #     shell: docker build -t reading-client-1 . && docker run reading-client-1
-            
-        # - name: install dependencies for pythom
-        #   shell: cd ./CSBench/readingClient && pip3 -r install requirements.txt 
+          shell: cd CSBench/readingClient && docker build -t reading-client-1 . && docker run reading-client-1 hola

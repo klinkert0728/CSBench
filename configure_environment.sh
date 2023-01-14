@@ -23,6 +23,6 @@ done
 # Copy mongo config to primary
 scp -i "./$keypair_file" -o StrictHostKeyChecking=no ./ansible/mongod.conf $keypair_name@$PRIMARY:~/  
 
-ansible-playbook -i hosts.yml ansible/configureMongo.yml
+ansible-playbook -i hosts.yml ansible/configureMongo.yml --ssh-common-args='-o StrictHostKeyChecking=no'
 
 ./configurePrimaryMembers.sh $PRIMARY ${IPS[@]}

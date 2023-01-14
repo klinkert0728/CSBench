@@ -7,13 +7,26 @@
     
     [reading_clients]
     {{READING_CLIENT_EU}} ansible_connection=ssh
+
+    [reading_clients_aus]
     {{READING_CLIENT_AUS}} ansible_connection=ssh
+
+    [reading_clients_aus:vars]
+    ansible_user=benchUser
+    ansible_ssh_private_key_file=./bench_dk_id_rsa
+    {{#REPLICAS_AUS}}
+    replica_{{index}}={{.}}
+    {{/REPLICAS_AUS}}
     
     [reading_clients:vars]
     ansible_user=benchUser
     ansible_ssh_private_key_file=./bench_dk_id_rsa
+    {{#REPLICAS_EU}}
+    replica_{{index}}={{.}}
+    {{/REPLICAS_EU}}
   
     
     [writing_clients:vars]
     ansible_user=benchUser
     ansible_ssh_private_key_file=./bench_dk_id_rsa
+    primary_copy={{PRIMARY}}
