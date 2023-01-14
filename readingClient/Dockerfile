@@ -1,8 +1,8 @@
 FROM python:3.10
 
-COPY requirements.txt /
+COPY readingClient/requirements.txt /
 RUN pip install -r /requirements.txt
 
-COPY reading_client.py /
+COPY readingClient/reading_client.py /
 
-CMD ["python," "/reading_client.py", "ARG IP"]
+CMD ["python3" "/reading_client.py", "ARG IP"]
