@@ -1,19 +1,16 @@
 #!/bin/bash
 cd "$(dirname "$0")" # Go to the script's directory
 
-export READING_CLIENT_EU=$1
-export READING_CLIENT_AUS=$2
+export READING_CLIENT_EU=($(gcloud compute instances list --filter="tags:reading-client AND tags:eu" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
+export READING_CLIENT_AUS=($(gcloud compute instances list --filter="tags:reading-client AND tags:aus" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
 
-# declare array for writing clients start in the 3rd position as the first two parameters are always going to be reading clients.
-declare -a IPS=()
-for i in "${@:3}"; do
-  IPS+=($(printf '%s' "$i"))
-done
+# declare array for writing clients start.
+declare -a IPS=($(gcloud compute instances list --filter="tags.items=writing-client" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
 
 # Get all the replica ips, so the reading client knows where to request information.
-declare -a REPLICAS_EU=($(gcloud compute instances list --filter="tags.items=replica,eu" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
+declare -a REPLICAS_EU=($(gcloud compute instances list --filter="tags:replica AND tags:eu" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
 
-declare -a REPLICAS_AUS=($(gcloud compute instances list --filter="tags.items=replica,aus" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
+declare -a REPLICAS_AUS=($(gcloud compute instances list --filter="tags:replica AND tags:aus" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
 
 # Get ip of primary
 export PRIMARY=($(gcloud compute instances list --filter="tags.items=primary" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))

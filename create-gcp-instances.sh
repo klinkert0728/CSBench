@@ -36,7 +36,7 @@ echo "starting instances..."
 gcloud compute instances create $PRIMARY_NAME --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=primary
 gcloud compute instances add-metadata $PRIMARY_NAME --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
-gcloud compute instances create $READING_CLIENT --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client
+gcloud compute instances create $READING_CLIENT --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,eu
 gcloud compute instances add-metadata $READING_CLIENT --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
 gcloud compute instances create "$READING_CLIENT-aus" --project=csbench --image-family=debian-11 --zone=australia-southeast1-b --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,aus
