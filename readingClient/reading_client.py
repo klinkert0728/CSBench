@@ -17,15 +17,14 @@ def measure_staleness():
         last_write_seconds = int(last_write_date.strftime('%s'))
         
         current_date = int(time.time())
-        staleness = current_date - last_write_seconds
-        print(result)
-        print(staleness)
-        write_to_file(staleness, current_date)
+        staleness = int((current_date - last_write_seconds) / 3600)
+        count = client[db_name]['products'].count_documents({})
+        write_to_file(staleness, current_date, count)
         time.sleep(10)
 
-def write_to_file(staleness, date):
+def write_to_file(staleness, date, product_count):
     path = f'{replica_url}.csv'
-    headers = ['timestamp', 'staleness', 'replica_info']
+    headers = ['timestamp', 'staleness', "product_count", 'replica_info']
     if os.path.exists(path):
         mode = 'a'
     else:
@@ -35,7 +34,7 @@ def write_to_file(staleness, date):
         curren_file = csv.DictWriter(csv_file, fieldnames=headers)
         if mode == 'w':
             curren_file.writeheader()
-        curren_file.writerow({ 'timestamp': date, 'staleness': staleness, 'replica_info': replica_url })
+        curren_file.writerow({ 'timestamp': date, 'staleness': staleness, 'product_count': product_count, 'replica_info': replica_url })
 
 try: 
     measure_staleness()

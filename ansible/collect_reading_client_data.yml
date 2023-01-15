@@ -1,0 +1,61 @@
+---
+    - name: Collect data from docker containers eu
+      hosts: reading_clients
+      remote_user: benchUser
+      become: yes
+      vars:
+        current_instances: {}
+      tasks:
+        - name: Get EU reading client target
+          set_fact:
+            current_instances: "{{ current_instances | combine({ item.key: item.value} ) }}"
+
+          when: item.key is match("replica*")
+          with_items: "{{ hostvars[groups.reading_clients[0]] | dict2items }}"
+
+        - name: check ips
+          ansible.builtin.debug:
+            msg: "{{ current_instances }}"
+        
+        - name: Collecting docker data
+          shell: docker cp "{{ item.key }}"-"{{ item.value }}":{{ item.value }}.csv .
+          
+          loop: "{{ current_instances | dict2items }} "
+
+        - name: Collecting docker locally
+          fetch: 
+            src: /home/benchUser/{{ item.value }}.csv
+            dest: ./results
+          
+          loop: "{{ current_instances | dict2items }} "
+
+    - name: Collect data from docker containers eu
+      hosts: reading_clients_aus
+      remote_user: benchUser
+      become: yes
+      vars:
+        current_instances: {}
+      tasks:
+        - name: Get EU reading client target
+          set_fact:
+            current_instances: "{{ current_instances | combine({ item.key: item.value} ) }}"
+
+          when: item.key is match("replica*")
+          with_items: "{{ hostvars[groups.reading_clients_aus[0]] | dict2items }}"
+
+        - name: check ips
+          ansible.builtin.debug:
+            msg: "{{ current_instances }}"
+        
+
+        - name: Collecting docker data
+          shell: docker cp "{{ item.key }}"-"{{ item.value }}":{{ item.value }}.csv .
+          
+          loop: "{{ current_instances | dict2items }} "
+        
+        - name: Collecting docker locally
+          fetch: 
+            src: /home/benchUser/{{ item.value }}.csv
+            dest: ./results
+          
+          loop: "{{ current_instances | dict2items }} "

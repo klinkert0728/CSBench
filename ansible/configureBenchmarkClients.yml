@@ -89,9 +89,12 @@
         - name: check ips
           ansible.builtin.debug:
             msg: "{{ current_instances }}"
+        
+        - name: build image
+          shell: cd CSBench/readingClient && docker build -t reading-client-eu .
 
         - name: Start docker targeting each replica
-          shell: cd CSBench/readingClient && docker build -t "{{ item.key }}" . && docker run "{{ item.key }}" "{{ item.value }}"
+          shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-eu "{{ item.value }}"
           
           loop: "{{ current_instances | dict2items }} "
 
@@ -113,7 +116,10 @@
           ansible.builtin.debug:
             msg: "{{ current_instances }}"
 
+        - name: build image
+          shell: cd CSBench/readingClient && docker build -t reading-client-aus .
+
         - name: Start docker targeting each replica
-          shell: cd CSBench/readingClient && docker build -t "{{ item.key }}" . && docker run "{{ item.key }}" "{{ item.value }}"
+          shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-aus "{{ item.value }}"
           
           loop: "{{ current_instances | dict2items }} "
