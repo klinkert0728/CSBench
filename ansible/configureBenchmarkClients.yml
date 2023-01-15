@@ -98,14 +98,14 @@
           
           loop: "{{ current_instances | dict2items }} "
 
-    - name: Start EU reading client docker
+    - name: Start AUS reading client docker
       hosts: reading_clients_aus
       remote_user: benchUser
       become: yes
       vars:
         current_instances: {}
       tasks:
-        - name: Get EU reading client target
+        - name: Get AUS reading client target
           set_fact:
             current_instances: "{{ current_instances | combine({ item.key: item.value} ) }}"
 

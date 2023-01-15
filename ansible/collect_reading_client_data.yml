@@ -29,7 +29,7 @@
           
           loop: "{{ current_instances | dict2items }} "
 
-    - name: Collect data from docker containers eu
+    - name: Collect data from docker containers AUS
       hosts: reading_clients_aus
       remote_user: benchUser
       become: yes
