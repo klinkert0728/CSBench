@@ -18,17 +18,6 @@ async function main() {
   await client.connect();
   console.log('Connected successfully to server');
   const db = client.db(dbName);
-  console.log(db)
-
-
-  //var collectionExists = await db.getCollectionNames()
-  //await db.createCollection(collectionName);
-
-  // if (collectionExists == false) {
-  //   await db.createCollection(collectionName);
-  // } else {
-  //   console.log("Collection already exits skip creating it")
-  // }
 
   inverval_timer = setInterval(async () => {
     const products = [];
