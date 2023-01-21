@@ -37,8 +37,8 @@ async function main() {
     }
 
     await db.collection(collectionName).insertMany(products)
-    console.log("batch of 200");
-  }, 500);
+    console.log("batch of 2000");
+  }, 3000);
 }
 
 function createProduct() {
