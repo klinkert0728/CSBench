@@ -16,20 +16,6 @@
         - name: clone repo
           shell: git clone https://github.com/klinkert0728/CSBench.git
     
-    - name: Configure Writing client
-      hosts: "writing_clients"
-      remote_user: benchUser
-      become: yes
-      tasks:
-        - name: download node
-          shell: curl -sL https://deb.nodesource.com/setup_14.x | bash
-
-        - name: install node
-          command: sudo apt install nodejs -y
-
-        - name: install dependencies
-          shell: cd ./CSBench/writingClient && npm install
-
     - name: install as root in reading clients
       hosts: "reading_clients, reading_clients_aus"
       remote_user: benchUser
@@ -123,3 +109,30 @@
           shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-aus "{{ item.value }}"
           
           loop: "{{ current_instances | dict2items }} "
+
+    - name: Configure Writing client
+      hosts: "writing_clients"
+      remote_user: benchUser
+      become: yes
+      tasks:
+        - name: download node
+          shell: curl -sL https://deb.nodesource.com/setup_14.x | bash
+
+        - name: install node
+          command: sudo apt install nodejs -y
+
+        - name: install dependencies
+          shell: cd ./CSBench/writingClient && npm install && npm install pm2 -g
+
+        - name: Check primary url
+          ansible.builtin.debug:
+            msg: "{{  hostvars[groups.writing_clients[0]].primary_copy }}"
+        
+        - name: Start first writing client to primary
+          ansible.builtin.shell: cd ./CSBench/writingClient && pm2 start -f app.js -- "{{  hostvars[groups.writing_clients[0]].primary_copy }}"
+          loop:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5

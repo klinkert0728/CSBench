@@ -20,7 +20,7 @@ def measure_staleness():
         staleness = int((current_date - last_write_seconds) / 3600)
         count = client[db_name]['products'].count_documents({})
         write_to_file(staleness, current_date, count)
-        time.sleep(10)
+        time.sleep(3) # 10 seconds its the default hearthbeat configured by mongo
 
 def write_to_file(staleness, date, product_count):
     path = f'{replica_url}.csv'

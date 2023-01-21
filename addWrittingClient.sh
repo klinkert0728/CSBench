@@ -7,16 +7,11 @@ set -euo pipefail
 export CLOUDSDK_COMPUTE_REGION=europe-west1
 export CLOUDSDK_COMPUTE_ZONE="${CLOUDSDK_COMPUTE_REGION}-b"
 
-# Read ssh key
-keypair_file=$1
-# User for ssh
-keypair_name=$2
-
 # Allow user to differenciate the client
-writing_client_number=$3
+writing_client_number=$1
 
 # Attach the client to a current run
-run=$4
+run=$2
 
 instance_name="writing-client-$writing_client_number-experiment-$run"
 gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=$instance_name

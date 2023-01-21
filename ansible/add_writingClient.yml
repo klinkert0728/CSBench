@@ -23,4 +23,13 @@
           shell: git clone https://github.com/klinkert0728/CSBench.git
 
         - name: Install dependencies
-          shell: cd CSBench/writingClient && npm install
+          shell: cd CSBench/writingClient && npm install && npm install pm2 -g
+        
+        - name: Start first writing client to primary
+          ansible.builtin.shell: cd ./CSBench/writingClient && pm2 start -f app.js -- "{{  hostvars[groups.writing_clients[0]].primary_copy }}"
+          loop:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5

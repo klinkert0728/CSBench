@@ -32,13 +32,13 @@ async function main() {
 
   inverval_timer = setInterval(async () => {
     const products = [];
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 2000; i++) {
       products.push(createProduct())
     }
 
     await db.collection(collectionName).insertMany(products)
-    console.log("batch of 20");
-  }, 3000);
+    console.log("batch of 200");
+  }, 500);
 }
 
 function createProduct() {
