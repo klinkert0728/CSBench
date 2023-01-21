@@ -1,9 +1,11 @@
 const { MongoClient } = require('mongodb');
 const { faker } = require('@faker-js/faker')
 var assert = require('assert');
+const process = require('process');
 
 // Connection URL
-const url = 'mongodb://192.158.29.134:27017?replicaSet=rs0&w=majority';
+const primaryURL = process.argv[2]
+const url = `mongodb://${primaryURL}:27017?replicaSet=rs0&w=majority`;
 const client = new MongoClient(url);
 
 // Database Name
@@ -16,25 +18,27 @@ async function main() {
   await client.connect();
   console.log('Connected successfully to server');
   const db = client.db(dbName);
+  console.log(db)
 
 
-  // var collectionExists = await db.getCollectionNames()
+  //var collectionExists = await db.getCollectionNames()
+  //await db.createCollection(collectionName);
 
-  // // if (collectionExists == false) {
-  // //   await db.createCollection(collectionName);
-  // // } else {
-  // //   console.log("Collection already exits skip creating it")
-  // // }
+  // if (collectionExists == false) {
+  //   await db.createCollection(collectionName);
+  // } else {
+  //   console.log("Collection already exits skip creating it")
+  // }
 
   inverval_timer = setInterval(async () => {
     const products = [];
-    for (let i = 0; i < 2000; i++) {
+    for (let i = 0; i < 200; i++) {
       products.push(createProduct())
     }
 
     await db.collection(collectionName).insertMany(products)
     console.log("batch of 20");
-  }, 500);
+  }, 3000);
 }
 
 function createProduct() {
