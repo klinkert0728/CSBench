@@ -16,7 +16,7 @@
         - name: clone repo
           shell: git clone https://github.com/klinkert0728/CSBench.git
     
-    - name: install as root in reading clients
+    - name: Install reading client dependencies
       hosts: "reading_clients, reading_clients_aus"
       remote_user: benchUser
       become: yes
@@ -40,15 +40,10 @@
           apt:
             name: ["docker-ce", "docker-ce-cli", "containerd.io", "docker-compose-plugin"]
             state: present
-        
-    - name: Configure reading client
-      hosts: "reading_clients, reading_clients_aus"
-      remote_user: benchUser
-      become: yes
-      tasks:
+
         - name: install requests requests
           command: python3 -m pip install requests
-        
+
         - name: pip install Docker
           command: pip install docker
 
@@ -138,6 +133,3 @@
             - 5
             - 6
             - 7
-            - 8
-            - 9
-            - 10
