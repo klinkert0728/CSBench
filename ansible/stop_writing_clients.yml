@@ -1,0 +1,12 @@
+---
+    - name: Stop writing clients
+      hosts: "writing_clients"
+      remote_user: benchUser
+      become: yes
+      tasks:
+        - name: Check primary url
+          ansible.builtin.debug:
+            msg: "{{  hostvars[groups.writing_clients[0]].primary_copy }}"
+        
+        - name: stop writing clients
+          shell: pm2 stop all
