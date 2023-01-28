@@ -19,7 +19,7 @@ def measure_staleness():
         
         current_date = int(time.time())
         staleness = int((current_date - last_write_seconds) / 3600)
-        count = client[db_name]['products'].count_documents({})
+        count = client[db_name].command("dbstats")["objects"]
         write_to_file(staleness, current_date, count)
         time.sleep(1) # 10 seconds its the default hearthbeat configured by mongo
 
