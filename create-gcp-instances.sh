@@ -42,7 +42,7 @@ gcloud compute instances add-metadata $READING_CLIENT --zone=$CLOUDSDK_COMPUTE_Z
 gcloud compute instances create "$READING_CLIENT-aus" --project=csbench --image-family=debian-11 --zone=australia-southeast1-b --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,aus
 gcloud compute instances add-metadata "$READING_CLIENT-aus" --zone=australia-southeast1-b --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
-#ADD firewall rules for SSH and ICMP for all VM with the tag cloud computing
+#ADD firewall rules for SSH, ICMP, Mongo for all VM.
 if gcloud compute firewall-rules list --filter="name~allow-mongo-firewall" | grep -c allow-mongo-firewall==0; then
     gcloud compute firewall-rules create "allow-mongo-firewall" --action=ALLOW --rules=icmp,tcp:22,tcp:27017 --source-ranges=0.0.0.0 --direction=INGRESS
 else
