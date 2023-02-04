@@ -11,7 +11,7 @@
         - name: Start reading primary
           ansible.builtin.shell: cd CSBench/readingClient && docker run -d --name primary_copy reading-client-eu "{{  hostvars[groups.reading_clients[0]].primary_copy }}" "primary"
 
-        - name: Get EU reading client target
+        - name: Start EU reading client target
           set_fact:
             current_instances: "{{ current_instances | combine({ item.key: item.value} ) }}"
 
@@ -36,7 +36,7 @@
       vars:
         current_instances: {}
       tasks:
-        - name: Get AUS reading client target
+        - name: Start AUS reading client target
           set_fact:
             current_instances: "{{ current_instances | combine({ item.key: item.value} ) }}"
 

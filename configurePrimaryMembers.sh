@@ -12,10 +12,14 @@ index() {
    [[ "${moCurrent#*.}"  ]] && echo "$((${moCurrent#*.} + 1))"
 }
 
+# mongo requires to have at least one voting member in a replica set deployment 
+# https://www.mongodb.com/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.members-n-.votes
 vote() {
     [[ "${moCurrent#*.}" == "0" ]] && echo "1"  || echo "0"
 }
 
+# mongo requires to have at least one voting member in a replica set deployment. The priority for the voting memeber needs to be == 1
+# https://www.mongodb.com/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.members-n-.priority
 priority() {
     [[ "${moCurrent#*.}" == "0" ]] && echo "1"  || echo "0"
 }
