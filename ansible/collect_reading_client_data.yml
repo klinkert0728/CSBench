@@ -1,17 +1,19 @@
 ---
     - name: Collect data from docker containers eu
       hosts: reading_clients
+      gather_facts: no
       remote_user: benchUser
+      strategy: free
       become: yes
       vars:
         current_instances: {}
       tasks:
         - name: Collect docker data for primary
-          shell: docker cp primary_copy:primary_copy.csv .
+          shell: docker cp primary_copy:{{ hostvars[groups.reading_clients[0]].primary_copy }}.csv .
 
         - name: Collecting docker locally
           fetch: 
-            src: /home/benchUser/primary_copy.csv
+            src: /home/benchUser/{{ hostvars[groups.reading_clients[0]].primary_copy }}.csv
             dest: ./results
 
         - name: Get EU reading client target
@@ -39,7 +41,9 @@
 
     - name: Collect data from docker containers AUS
       hosts: reading_clients_aus
+      gather_facts: no
       remote_user: benchUser
+      strategy: free
       become: yes
       vars:
         current_instances: {}

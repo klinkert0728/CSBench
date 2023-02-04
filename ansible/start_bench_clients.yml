@@ -1,0 +1,75 @@
+---     
+    - name: Start EU reading client docker
+      hosts: reading_clients
+      strategy: free
+      gather_facts: no
+      remote_user: benchUser
+      become: yes
+      vars:
+        current_instances: {}
+      tasks:
+        - name: Start reading primary
+          ansible.builtin.shell: cd CSBench/readingClient && docker run -d --name primary_copy reading-client-eu "{{  hostvars[groups.reading_clients[0]].primary_copy }}" "primary"
+
+        - name: Get EU reading client target
+          set_fact:
+            current_instances: "{{ current_instances | combine({ item.key: item.value} ) }}"
+
+          when: item.key is match("replica*")
+          with_items: "{{ hostvars[groups.reading_clients[0]] | dict2items }}"
+
+        - name: check ips
+          ansible.builtin.debug:
+            msg: "{{ current_instances }}"
+        
+        - name: Start docker targeting each replica
+          shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-eu "{{ item.value }}" "secondary"
+          
+          loop: "{{ current_instances | dict2items }} "
+
+    - name: Start AUS reading client docker
+      hosts: reading_clients_aus
+      gather_facts: no
+      strategy: free
+      remote_user: benchUser
+      become: yes
+      vars:
+        current_instances: {}
+      tasks:
+        - name: Get AUS reading client target
+          set_fact:
+            current_instances: "{{ current_instances | combine({ item.key: item.value} ) }}"
+
+          when: item.key is match("replica*")
+          with_items: "{{ hostvars[groups.reading_clients_aus[0]] | dict2items }}"
+
+        - name: check ips
+          ansible.builtin.debug:
+            msg: "{{ current_instances }}"
+
+        - name: Start docker targeting each replica
+          shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-aus "{{ item.value }}" "secondary"
+          
+          loop: "{{ current_instances | dict2items }} "
+
+    - name: Configure Writing client
+      hosts: "writing_clients"
+      gather_facts: no
+      remote_user: benchUser
+      strategy: free
+      become: yes
+      tasks:
+        - name: Check primary url
+          ansible.builtin.debug:
+            msg: "{{  hostvars[groups.writing_clients[0]].primary_copy }}"
+        
+        - name: Start first writing client to primary
+          ansible.builtin.shell: cd ./CSBench/writingClient && pm2 start -f app.js -- "{{  hostvars[groups.writing_clients[0]].primary_copy }}"
+          loop:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
