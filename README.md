@@ -74,4 +74,6 @@ This will create a folder inside `ansible` folder called `results`. and it will 
 <br>
 <br>
 
-The results folder containsthree experements executed for the subject `Cloud Service Benchmarking`, with some basic graphics used to analize the data and create the report `https://www.overleaf.com/read/nmfqzgmmcskg`.
+The experiments were executed for 15 minutes, after the 15 min the command `ansible-playbook -i clients_hosts.yml -f 30 ansible/stop_writing_clients.yml --ssh-common-args='-o StrictHostKeyChecking=no'` was executed, afterwards 5 more minutes where given to ensure the vm reduce the load as expected.
+
+The results folder contains three experements executed for the subject `Cloud Service Benchmarking`, with some basic graphics used to analize the data and create the report `https://www.overleaf.com/read/nmfqzgmmcskg`.
