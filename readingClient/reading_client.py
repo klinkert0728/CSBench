@@ -6,7 +6,8 @@ import sys
 import psutil
 
 replica_url = sys.argv[1]
-url = f'mongodb://{replica_url}:27017/?replicaSet=rs0&directConnection=true&readPreference=secondary'
+read_preference = sys.argv[2]
+url = f'mongodb://{replica_url}:27017/?replicaSet=rs0&directConnection=true&readPreference={read_preference}'
 db_name = 'csbench'
 client = MongoClient(url)
 

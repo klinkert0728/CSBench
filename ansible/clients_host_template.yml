@@ -24,6 +24,7 @@
     {{#REPLICAS_EU}}
     replica_{{index}}_eu={{.}}
     {{/REPLICAS_EU}}
+    primary_copy={{PRIMARY}}
   
     
     [writing_clients:vars]

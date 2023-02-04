@@ -6,6 +6,14 @@
       vars:
         current_instances: {}
       tasks:
+        - name: Collect docker data for primary
+          shell: docker cp primary_copy:primary_copy.csv .
+
+        - name: Collecting docker locally
+          fetch: 
+            src: /home/benchUser/primary_copy.csv
+            dest: ./results
+
         - name: Get EU reading client target
           set_fact:
             current_instances: "{{ current_instances | combine({ item.key: item.value} ) }}"

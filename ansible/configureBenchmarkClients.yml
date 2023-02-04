@@ -75,9 +75,13 @@
           shell: cd CSBench/readingClient && docker build -t reading-client-eu .
 
         - name: Start docker targeting each replica
-          shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-eu "{{ item.value }}"
+          shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-eu "{{ item.value }}" "secondary"
           
           loop: "{{ current_instances | dict2items }} "
+
+        - name: Start reading primary
+          ansible.builtin.shell: cd CSBench/readingClient && docker run -d --name primary_copy reading-client-eu "{{  hostvars[groups.writing_clients[0]].primary_copy }}" "primary"
+          // TEST starting reading client for the primary
 
     - name: Start AUS reading client docker
       hosts: reading_clients_aus
@@ -101,7 +105,7 @@
           shell: cd CSBench/readingClient && docker build -t reading-client-aus .
 
         - name: Start docker targeting each replica
-          shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-aus "{{ item.value }}"
+          shell: cd CSBench/readingClient && docker run -d --name "{{ item.key }}"-"{{ item.value }}" reading-client-aus "{{ item.value }}" "secondary"
           
           loop: "{{ current_instances | dict2items }} "
 
