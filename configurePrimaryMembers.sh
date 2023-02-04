@@ -12,6 +12,14 @@ index() {
    [[ "${moCurrent#*.}"  ]] && echo "$((${moCurrent#*.} + 1))"
 }
 
+vote() {
+    [[ "${moCurrent#*.}" == "0" ]] && echo "1"  || echo "0"
+}
+
+priority() {
+    [[ "${moCurrent#*.}" == "0" ]] && echo "1"  || echo "0"
+}
+
 export IPS=$IPS
 . ./mo
 cat mongosh/config_template | mo > mongosh/members_config.js
