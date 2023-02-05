@@ -3,7 +3,7 @@ rs.initiate( {
     members: [
        { _id: 0, host: "{{PRIMARY}}:27017" },
        {{#IPS}}
-       { _id: {{index}}, host: "{{.}}:27017", priority: {{priority}}, votes: {{vote}} },
+       { _id: {{index}}, host: "{{.}}:27017", priority: 0, votes: {{vote}} },
        {{/IPS}}
     ]
  })
