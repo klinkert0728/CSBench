@@ -15,7 +15,7 @@ declare -a REPLICAS_AUS=($(gcloud compute instances list --filter="tags:replica 
 # Get ip of primary.
 export PRIMARY=($(gcloud compute instances list --filter="tags.items=primary" --format="value(EXTERNAL_IP)"  | tr '\n' ' '))
 
-# get index of the array, to allow the host file diferenciate between replicas.
+# get index of the array, to allow the host file differentiate between replicas.
 index() {
   [[ "${moCurrent#*.}"  ]] && echo "$((${moCurrent#*.} + 1))"
 }

@@ -4,8 +4,11 @@ set -euo pipefail
 
 
 run=$1 # determines the experiment run number
-NUMBER_OF_REPLICAS=$2 # number of replicatas that will be created (minimum recommended 2 ). without counting the primary
+NUMBER_OF_REPLICAS=$2 # number of replicas that will be created (minimum recommended 2 ). without counting the primary
 NUMBER_OF_WR_CLIENTS=$3 # determines the number of benchmark clients instances that will be created.
+
+# GoogleCloud project
+PROJECT=csbench
 
 # set the primary name
 PRIMARY_NAME=primary-experiment-$run
@@ -34,13 +37,13 @@ export CLOUDSDK_COMPUTE_ZONE="${CLOUDSDK_COMPUTE_REGION}-b"
 
 echo "starting instances..."
 # create primary instance
-gcloud compute instances create $PRIMARY_NAME --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=primary
+gcloud compute instances create $PRIMARY_NAME --project=$PROJECT --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=primary
 gcloud compute instances add-metadata $PRIMARY_NAME --zone=$CLOUDSDK_COMPUTE_ZONE --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
-gcloud compute instances create $READING_CLIENT --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,eu
+gcloud compute instances create $READING_CLIENT --project=$PROJECT --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,eu
 gcloud compute instances add-metadata $READING_CLIENT --zone=$CLOUDSDK_COMPUTE_ZONE --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
-gcloud compute instances create "$READING_CLIENT-aus" --project=csbench --image-family=debian-11 --zone=australia-southeast1-b --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,aus
+gcloud compute instances create "$READING_CLIENT-aus" --project=$PROJECT --image-family=debian-11 --zone=australia-southeast1-b --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=reading-client,aus
 gcloud compute instances add-metadata "$READING_CLIENT-aus" --zone=australia-southeast1-b --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 
 # add firewall rules for SSH, ICMP, Mongo for all VM.
@@ -61,14 +64,14 @@ for i in `seq 1 $NUMBER_OF_REPLICAS`; do
   fi
 
   instance_name="replica-$i-experiment-$run-$instance_region"
-  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$instance_region --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=$tags
+  gcloud compute instances create $instance_name --project=$PROJECT --image-family=debian-11 --zone=$instance_region --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=$tags
   gcloud compute instances add-metadata $instance_name  --zone=$instance_region --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 done
 
 # create writing client instances
 for i in `seq 1 $NUMBER_OF_WR_CLIENTS`; do
   instance_name="writing-client-$i-experiment-$run"
-  gcloud compute instances create $instance_name --project=csbench --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=writing-client
+  gcloud compute instances create $instance_name --project=$PROJECT --image-family=debian-11 --zone=$CLOUDSDK_COMPUTE_ZONE --image-project=debian-cloud  --machine-type=e2-medium --create-disk=auto-delete=yes --tags=writing-client
   gcloud compute instances add-metadata $instance_name  --zone=$CLOUDSDK_COMPUTE_ZONE --metadata-from-file ssh-keys="./id_rsa_formatted.pub"
 done
 
