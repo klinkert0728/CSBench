@@ -6,3 +6,4 @@ members_config.js
 node_modules
 **/*id_rsa*
 .DS_Store
+.idea
